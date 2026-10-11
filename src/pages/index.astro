@@ -1,81 +1,92 @@
 ---
 import Main from "../layouts/main.astro";
+import { BookOpen, ArrowUpRight, UserRound } from "@lucide/astro";
 ---
 
 <Main title="tadpole">
-  <div class="font-jost font-medium bg-ctp-base">
-    <div class="absolute top-5 right-5 flex flex-row-reverse p-1">
-      <img
-        class="w-28 rounded-full"
-        src="https://cattreats.dev/img/pfp.jpg"
-        alt="User profile picture"
-      />
-      <div class="flex flex-col text-right text-[28px] mr-4 justify-center">
-        <span class="text-ctp-text font-bold">@charlotte</span>
-        <span class="text-ctp-subtext1 font-normal leading-4">user</span>
+  <div class="min-h-dvh bg-ctp-base font-jost font-medium text-ctp-text">
+    <div class="absolute top-3 right-3 z-10 flex items-center gap-2 sm:top-4 sm:right-4">
+      <div class="flex flex-col justify-center text-right">
+        <span class="text-base font-bold leading-tight text-ctp-text sm:text-lg">@charlotte</span>
+        <span class="mt-0.5 text-xs font-normal leading-tight text-ctp-subtext1 sm:text-sm">user</span>
+      </div>
+      <div class="flex h-9 w-9 items-center justify-center rounded-full bg-ctp-surface0 text-ctp-subtext1 transition-colors hover:bg-ctp-surface1 sm:h-10 sm:w-10">
+        <UserRound class="h-[18px] w-[18px] sm:h-5 sm:w-5" />
       </div>
     </div>
 
-    <div class="flex h-dvh grow flex-col items-center justify-center">
-      <div class="flex flex-1 flex-col items-center justify-center">
-        <h1 class="bg-linear-50 bg-clip-text font-besley font-bold italic text-transparent from-ctp-green to-ctp-teal text-[10rem]">tadpole</h1>
-        <p class="text-[1.75rem] text-ctp-subtext0">an open-source, self-hostable file server.</p>
+    <div class="flex min-h-dvh grow flex-col items-center justify-center px-5 pt-16 sm:px-8 sm:pt-12">
+      <div class="flex flex-1 flex-col items-center justify-center text-center">
+        <h1 class="bg-linear-50 bg-clip-text font-besley text-6xl font-bold italic leading-none tracking-tight text-transparent from-ctp-green to-ctp-teal sm:text-8xl lg:text-[9rem]">tadpole</h1>
 
-        <div class="mt-4 gap-4 flex text-ctp-subtext1">
+        <p class="mt-4 max-w-xl text-base font-normal leading-relaxed text-ctp-subtext0 sm:mt-5 sm:text-xl lg:text-2xl">an open-source, self-hostable file server.</p>
+
+        <div class="mt-6 flex w-full flex-col gap-3 text-ctp-subtext1 sm:mt-7 sm:w-auto sm:flex-row sm:gap-3">
           <a
             href="rules"
-            class="text-center bg-ctp-surface0 p-1 rounded-md w-40"
+            class="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-4 text-center transition-colors hover:border-ctp-overlay0 hover:bg-ctp-surface1 sm:w-40"
           >
-            instance rules
+            <BookOpen class="h-[17px] w-[17px]" />
+            <span>instance rules</span>
           </a>
+
           <a
             href="upload"
-            class="text-center bg-ctp-surface0 p-1 rounded-md w-40"
+            class="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-4 text-center transition-colors hover:border-ctp-overlay0 hover:bg-ctp-surface1 sm:w-40"
           >
-            upload files...
+            <ArrowUpRight class="h-[17px] w-[17px]" />
+            <span>upload files...</span>
           </a>
         </div>
       </div>
 
-      <p class="text-center text-ctp-subtext0">
-        running version{" "}
-        <a
-          class="text-ctp-green"
-          href={HASH}
-        >
-          {VERSION}
-        </a>{" "}
-        ·&nbsp;
-        <span
-          class="text-ctp-green"
-          id="sumcount"
-        >
-          1,234
-        </span>
-        &nbsp;files uploaded · using&nbsp;
-        <span
-          class="text-ctp-green"
-          id="sumsize"
-        >
-          56.78 gb
-        </span>
-        <br /> &copy; 2026&nbsp;
-        <a
-          href="https://github.com/stressfulpuppy/tadpole"
-          target="_blank"
-          class="text-ctp-green"
-        >
-          tadpole contributors
-        </a>
-        &nbsp;· for takedowns, please email&nbsp;
-        <a
-          href="mailto:abuse@tadpole.rip"
-          target="_blank"
-          class="text-ctp-green"
-        >
-          abuse@tadpole.rip
-        </a>
-      </p>
+      <footer class="w-full pb-2 pt-3 text-center text-[11px] font-normal leading-relaxed text-ctp-subtext0 sm:pb-3 sm:pt-4 sm:text-xs">
+        <p class="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+          <span>running version</span>
+          <a
+            class="text-ctp-green underline-offset-4 transition-colors hover:text-ctp-teal hover:underline"
+            href={HASH}
+          >
+            {VERSION}
+          </a>
+          <span class="text-ctp-overlay0">·</span>
+          <span
+            id="sumcount"
+            class="font-medium text-ctp-text"
+          >
+            1,234
+          </span>
+          <span>files uploaded</span>
+          <span class="text-ctp-overlay0">·</span>
+          <span>using</span>
+          <span
+            id="sumsize"
+            class="font-medium text-ctp-text"
+          >
+            56.78 GB
+          </span>
+        </p>
+
+        <p class="mt-1 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5">
+          <span>© 2026</span>
+          <a
+            href="https://github.com/stressfulpuppy/tadpole/graphs/contributors"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-ctp-green underline-offset-4 transition-colors hover:text-ctp-teal hover:underline"
+          >
+            tadpole contributors
+          </a>
+          <span class="text-ctp-overlay0">·</span>
+          <span>for takedowns, please email</span>
+          <a
+            href="mailto:abuse@tadpole.rip"
+            class="text-ctp-green underline-offset-4 transition-colors hover:text-ctp-teal hover:underline"
+          >
+            abuse@tadpole.rip
+          </a>
+        </p>
+      </footer>
     </div>
   </div>
 </Main>

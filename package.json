@@ -6,7 +6,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "npx astro preferences disable devToolbar && astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^11.1.7",
+    "@lucide/astro": "^1.54.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.8",
     "better-sqlite3": "^13.0.3",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@catppuccin/tailwindcss": "^1.0.0",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^26.6.5",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.1",

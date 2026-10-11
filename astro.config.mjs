@@ -8,7 +8,7 @@ import node from "@astrojs/node";
 const { version } = pkg;
 
 export default defineConfig({
-  output: 'server',
+  output: "server",
 
   vite: {
     plugins: [tailwindcss()],
@@ -22,8 +22,8 @@ export default defineConfig({
   },
 
   adapter: node({
-    mode: "middleware"
-  })
+    mode: "middleware",
+  }),
 });
 
 function getCommit() {

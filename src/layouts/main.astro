@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+import UserHeader from "../components/userheader.astro";
+import SiteFooter from "../components/sitefooter.astro";
 const { title } = Astro.props;
 ---
 
@@ -24,6 +26,12 @@ const { title } = Astro.props;
     </title>
   </head>
   <body class="bg-ctp-base">
-    <slot />
+    <div class="relative flex min-h-dvh flex-col bg-ctp-base font-jost font-medium text-ctp-text">
+      <UserHeader />
+      <main class="flex w-full flex-1 flex-col items-center px-5 sm:px-8">
+        <slot />
+      </main>
+      <SiteFooter />
+    </div>
   </body>
 </html>

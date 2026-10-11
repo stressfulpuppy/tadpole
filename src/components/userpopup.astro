@@ -3,12 +3,33 @@
 
 <div
   id="userContextMenu"
-  class="leading-8 absolute mt-0 right-2 top-full w-42 bg-ctp-surface0 hidden p-4 rounded-xl"
+  class="absolute right-0 top-full mt-2 hidden w-48 rounded-xl bg-ctp-surface0 p-2"
 >
   <ul>
-    <li class="hover:bg-ctp-surface1 pl-2 pr-2 p-1 rounded-lg">Account Settings</li>
-    <li class="hover:bg-ctp-surface1 pl-2 pr-2 p-1 rounded-lg">My Uploads</li>
-    <li class="hover:bg-ctp-surface1 pl-2 pr-2 p-1 rounded-lg">Admin Panel</li>
+    <li class="rounded-lg hover:bg-ctp-surface1">
+      <a
+        class="block px-2 py-1"
+        href="/settings"
+      >
+        Account Settings
+      </a>
+    </li>
+    <li class="rounded-lg hover:bg-ctp-surface1">
+      <a
+        class="block px-2 py-1"
+        href="/uploads"
+      >
+        My Uploads
+      </a>
+    </li>
+    <li class="rounded-lg hover:bg-ctp-surface1">
+      <a
+        class="block px-2 py-1"
+        href="/admin"
+      >
+        Admin Panel
+      </a>
+    </li>
   </ul>
 </div>
 
@@ -16,12 +37,19 @@
   const userContextElement = document.getElementById("userContext");
   const userContextMenu = document.getElementById("userContextMenu");
 
-  userContextElement?.addEventListener("click", () => {
-    if (!userContextMenu) return;
-    const isHidden = userContextMenu.classList.contains("hidden");
-    if (isHidden === true) {
-      userContextMenu?.classList.remove("hidden");
-    } else {
+  userContextElement?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    userContextMenu?.classList.toggle("hidden");
+  });
+
+  document.addEventListener("click", (event) => {
+    if (userContextMenu && !userContextMenu.contains(event.target as Node) && !userContextElement?.contains(event.target as Node)) {
+      userContextMenu.classList.add("hidden");
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
       userContextMenu?.classList.add("hidden");
     }
   });

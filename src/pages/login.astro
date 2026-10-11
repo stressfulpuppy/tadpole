@@ -1,0 +1,35 @@
+---
+import Main from "../layouts/main.astro";
+import { LogIn, TriangleAlert } from "@lucide/astro";
+
+const error = Astro.url.searchParams.get("error");
+---
+
+<Main title="tadpole - login">
+  <div class="flex w-full max-w-md flex-1 flex-col items-center justify-center py-20 text-center">
+    <h1 class="bg-linear-50 bg-clip-text font-besley text-5xl font-bold italic leading-none tracking-tight text-transparent from-ctp-green to-ctp-teal sm:text-6xl">login</h1>
+    <p class="mt-3 max-w-xl text-base font-normal leading-relaxed text-ctp-subtext0 sm:text-lg">sign in with discord to upload files.</p>
+
+    {error && (
+      <div class="mt-6 flex w-full items-start gap-2 rounded-lg border border-ctp-red/40 bg-ctp-red/10 px-4 py-3 text-left text-sm font-normal">
+        <TriangleAlert class="mt-0.5 h-4 w-4 shrink-0 text-ctp-red" />
+        <p class="text-ctp-text">login failed: {error}</p>
+      </div>
+    )}
+
+    <a
+      href="/api/login"
+      class="mt-6 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-ctp-green px-4 font-semibold text-ctp-base transition-opacity hover:opacity-90"
+    >
+      <LogIn class="h-4 w-4" />
+      <span>continue with discord</span>
+    </a>
+
+    <a
+      href="/"
+      class="mt-3 text-sm font-normal text-ctp-subtext0 underline-offset-4 transition-colors hover:text-ctp-text hover:underline"
+    >
+      back home
+    </a>
+  </div>
+</Main>

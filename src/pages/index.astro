@@ -1,16 +1,81 @@
 ---
+import Main from "../layouts/main.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Main title="tadpole">
+  <div class="font-jost font-medium bg-ctp-base">
+    <div class="absolute top-5 right-5 flex flex-row-reverse p-1">
+      <img
+        class="w-28 rounded-full"
+        src="https://cattreats.dev/img/pfp.jpg"
+        alt="User profile picture"
+      />
+      <div class="flex flex-col text-right text-[28px] mr-4 justify-center">
+        <span class="text-ctp-text font-bold">@charlotte</span>
+        <span class="text-ctp-subtext1 font-normal leading-4">user</span>
+      </div>
+    </div>
+
+    <div class="flex h-dvh grow flex-col items-center justify-center">
+      <div class="flex flex-1 flex-col items-center justify-center">
+        <h1 class="bg-linear-50 bg-clip-text font-besley font-bold italic text-transparent from-ctp-green to-ctp-teal text-[10rem]">tadpole</h1>
+        <p class="text-[1.75rem] text-ctp-subtext0">an open-source, self-hostable file server.</p>
+
+        <div class="mt-4 gap-4 flex text-ctp-subtext1">
+          <a
+            href="rules"
+            class="text-center bg-ctp-surface0 p-1 rounded-md w-40"
+          >
+            instance rules
+          </a>
+          <a
+            href="upload"
+            class="text-center bg-ctp-surface0 p-1 rounded-md w-40"
+          >
+            upload files...
+          </a>
+        </div>
+      </div>
+
+      <p class="text-center text-ctp-subtext0">
+        running version{" "}
+        <a
+          class="text-ctp-green"
+          href={HASH}
+        >
+          {VERSION}
+        </a>{" "}
+        ·&nbsp;
+        <span
+          class="text-ctp-green"
+          id="sumcount"
+        >
+          1,234
+        </span>
+        &nbsp;files uploaded · using&nbsp;
+        <span
+          class="text-ctp-green"
+          id="sumsize"
+        >
+          56.78 gb
+        </span>
+        <br /> &copy; 2026&nbsp;
+        <a
+          href="https://github.com/stressfulpuppy/tadpole"
+          target="_blank"
+          class="text-ctp-green"
+        >
+          tadpole contributors
+        </a>
+        &nbsp;· for takedowns, please email&nbsp;
+        <a
+          href="mailto:abuse@tadpole.rip"
+          target="_blank"
+          class="text-ctp-green"
+        >
+          abuse@tadpole.rip
+        </a>
+      </p>
+    </div>
+  </div>
+</Main>

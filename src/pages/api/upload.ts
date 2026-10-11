@@ -1,9 +1,15 @@
 import type { APIRoute } from "astro";
+import { validateSession } from "../../utils/session";
 
 const MAX_SIZE = 256 * 1024 * 1024;
 const UNALLOWED_EXTENSIONS = new Set(["exe", "scr", "cpl", "jar", "bat", "cmd", "com", "msi", "ps1", "vbs", "vbe", "js", "jse", "wsf", "wsh", "hta", "reg", "lnk", "doc", "docx"]);
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
+  const session = validateSession(request, cookies, clientAddress);
+  if (!session) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const contentType = request.headers.get("content-type") ?? "";
 
   if (!/^multipart\/form-data\s*(?:;|$)/i.test(contentType)) {

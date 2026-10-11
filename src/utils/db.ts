@@ -19,4 +19,12 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_sessions_discord_id ON sessions (discord_id);
 `);
 
+const sessionColumns = db.prepare("PRAGMA table_info(sessions)").all() as { name: string }[];
+if (!sessionColumns.some((c) => c.name === "ip")) {
+  db.exec("ALTER TABLE sessions ADD COLUMN ip TEXT");
+}
+if (sessionColumns.some((c) => c.name === "ip_hash")) {
+  db.exec("ALTER TABLE sessions DROP COLUMN ip_hash");
+}
+
 export default db;

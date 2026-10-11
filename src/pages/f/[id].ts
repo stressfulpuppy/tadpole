@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
-import { existsSync, readFileSync } from "node:fs";
+import { createReadStream, statSync } from "node:fs";
 import { join } from "node:path";
+import { Readable } from "node:stream";
 import db from "../../utils/db";
 
 interface FileRow {
@@ -25,18 +26,22 @@ export const GET: APIRoute = async ({ params }) => {
   }
 
   const path = join("data/uploads", row.id);
-  if (!existsSync(path)) {
+
+  let size: number;
+  try {
+    size = statSync(path).size;
+  } catch {
     return new Response("Not found", { status: 404 });
   }
 
-  const data = readFileSync(path);
   const safeName = row.name.replace(/["\\\r\n]/g, "_");
 
-  return new Response(data, {
+  return new Response(Readable.toWeb(createReadStream(path)) as ReadableStream, {
     headers: {
       "Content-Type": row.mime || "application/octet-stream",
-      "Content-Length": String(data.length),
+      "Content-Length": String(size),
       "Content-Disposition": `inline; filename="${safeName}"`,
+      "Content-Security-Policy": "sandbox",
       "Cache-Control": "public, max-age=31536000, immutable",
       "X-Content-Type-Options": "nosniff",
     },

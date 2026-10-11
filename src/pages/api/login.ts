@@ -1,16 +1,16 @@
 import type { APIRoute } from "astro";
 import { getRedirectUri, isSecureRequest } from "../../utils/session";
 
-export const GET: APIRoute = async ({ request, cookies }) => {
+export const GET: APIRoute = async ({ request, cookies, clientAddress }) => {
   const clientId = import.meta.env.CLIENTID;
-  const redirectUri = getRedirectUri(request);
+  const redirectUri = getRedirectUri(request, clientAddress);
 
   if (!clientId) {
     return new Response("OAuth not configured", { status: 500 });
   }
 
   const state = crypto.randomUUID();
-  const secure = isSecureRequest(request);
+  const secure = isSecureRequest(request, clientAddress);
 
   cookies.set("oauth_state", state, {
     path: "/",

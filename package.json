@@ -18,11 +18,13 @@
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.8",
     "better-sqlite3": "^13.0.3",
+    "busboy": "^1.6.0",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@catppuccin/tailwindcss": "^1.0.0",
     "@types/better-sqlite3": "^9.6.0",
+    "@types/busboy": "^1.5.5",
     "@types/node": "^26.6.5",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.1",

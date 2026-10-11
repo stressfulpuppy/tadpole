@@ -25,7 +25,7 @@ export function normalizeIp(ip: string): string {
   return v;
 }
 
-function isPublicIp(ip: string): boolean {
+export function isPublicIp(ip: string): boolean {
   if (ip.includes(":")) {
     if (ip === "::1") return false;
     if (ip.startsWith("fc") || ip.startsWith("fd")) return false;
@@ -95,19 +95,21 @@ export function getAvatarUrl(session: Pick<Session, "discord_id" | "avatar">, si
   return `https://cdn.discordapp.com/avatars/${session.discord_id}/${session.avatar}.${ext}?size=${size}`;
 }
 
-export function getPublicOrigin(request: Request): string {
+export function getPublicOrigin(request: Request, clientAddress?: string): string {
   const fallback = new URL(request.url);
-  const proto = request.headers.get("x-forwarded-proto")?.split(",")[0].trim() || fallback.protocol.replace(":", "");
-  const host = request.headers.get("x-forwarded-host")?.split(",")[0].trim() || fallback.host;
+  const direct = clientAddress ? normalizeIp(clientAddress) : "";
+  const viaProxy = !direct || !isPublicIp(direct);
+  const proto = (viaProxy ? request.headers.get("x-forwarded-proto")?.split(",")[0].trim() : "") || fallback.protocol.replace(":", "");
+  const host = (viaProxy ? request.headers.get("x-forwarded-host")?.split(",")[0].trim() : "") || fallback.host;
   return `${proto}://${host}`;
 }
 
-export function isSecureRequest(request: Request): boolean {
-  return getPublicOrigin(request).startsWith("https://");
+export function isSecureRequest(request: Request, clientAddress?: string): boolean {
+  return getPublicOrigin(request, clientAddress).startsWith("https://");
 }
 
-export function getRedirectUri(request: Request): string {
+export function getRedirectUri(request: Request, clientAddress?: string): string {
   const configured = import.meta.env.REDIRECT as string | undefined;
   if (configured) return configured;
-  return new URL("/api/callback", getPublicOrigin(request)).toString();
+  return new URL("/api/callback", getPublicOrigin(request, clientAddress)).toString();
 }

@@ -1,4 +1,28 @@
 ---
 ---
 
+<div
+  id="userContextMenu"
+  class="leading-8 absolute mt-0 right-2 top-full w-42 bg-ctp-surface0 hidden p-4 rounded-xl"
+>
+  <ul>
+    <li class="hover:bg-ctp-surface1 pl-2 pr-2 p-1 rounded-lg">Account Settings</li>
+    <li class="hover:bg-ctp-surface1 pl-2 pr-2 p-1 rounded-lg">My Uploads</li>
+    <li class="hover:bg-ctp-surface1 pl-2 pr-2 p-1 rounded-lg">Admin Panel</li>
+  </ul>
+</div>
 
+<script>
+  const userContextElement = document.getElementById("userContext");
+  const userContextMenu = document.getElementById("userContextMenu");
+
+  userContextElement?.addEventListener("click", () => {
+    if (!userContextMenu) return;
+    const isHidden = userContextMenu.classList.contains("hidden");
+    if (isHidden === true) {
+      userContextMenu?.classList.remove("hidden");
+    } else {
+      userContextMenu?.classList.add("hidden");
+    }
+  });
+</script>

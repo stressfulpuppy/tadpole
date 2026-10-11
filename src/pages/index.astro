@@ -1,18 +1,26 @@
 ---
 import Main from "../layouts/main.astro";
+import UserPopup from "../components/userpopup.astro";
 import { BookOpen, ArrowUpRight, UserRound } from "@lucide/astro";
 ---
 
 <Main title="tadpole">
   <div class="min-h-dvh bg-ctp-base font-jost font-medium text-ctp-text">
-    <div class="absolute top-4 right-4 md:top-0 md:right-0 z-10 flex items-center gap-2 md:p-6 rounded-lg hover:bg-ctp-surface2 hover:text-ctp-overlay2">
-      <div class="flex flex-col justify-center text-right">
-        <span class="text-base font-bold leading-tight text-ctp-text sm:text-lg">@charlotte</span>
-        <span class="mt-0.5 text-xs font-normal leading-tight text-ctp-subtext1 sm:text-sm">user</span>
-      </div>
-      <div class="flex h-9 w-9 items-center justify-center rounded-full bg-ctp-surface0 text-ctp-subtext1 transition-colors hover:bg-ctp-surface1 sm:h-10 sm:w-10">
-        <UserRound class="h-[18px] w-[18px] sm:h-5 sm:w-5" />
-      </div>
+    <div class="absolute top-0 right-0 justify-items-end">
+      <button
+        id="userContext"
+        class="flex gap-2 items-center top-4 mt-4 md:mt-0 rounded-lg hover:bg-ctp-surface2 md:min-w-0 min-w-42 md:p-6 z-10"
+      >
+        <div class="flex flex-col justify-end text-right">
+          <span class="text-lg font-bold leading-tight text-ctp-text">@charlotte</span>
+          <span class="mt-0.5 text-lg font-normal leading-tight text-ctp-subtext1">user</span>
+        </div>
+        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-ctp-surface0 text-ctp-subtext1 transition-colors hover:bg-ctp-surface1 sm:h-14 sm:w-14">
+          <UserRound class="h-4.5 w-4.5 sm:h-8 sm:w-8" />
+        </div>
+      </button>
+
+      <UserPopup />
     </div>
 
     <div class="flex min-h-dvh grow flex-col items-center justify-center px-5 pt-16 sm:px-8 sm:pt-12">
@@ -26,7 +34,7 @@ import { BookOpen, ArrowUpRight, UserRound } from "@lucide/astro";
             href="rules"
             class="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-4 text-center transition-colors hover:border-ctp-overlay0 hover:bg-ctp-surface1 sm:w-40"
           >
-            <BookOpen class="h-[17px] w-[17px]" />
+            <BookOpen class="h-4.25 w-4.25" />
             <span>instance rules</span>
           </a>
 
@@ -34,7 +42,7 @@ import { BookOpen, ArrowUpRight, UserRound } from "@lucide/astro";
             href="upload"
             class="flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-4 text-center transition-colors hover:border-ctp-overlay0 hover:bg-ctp-surface1 sm:w-40"
           >
-            <ArrowUpRight class="h-[17px] w-[17px]" />
+            <ArrowUpRight class="h-4.25 w-4.25" />
             <span>upload files...</span>
           </a>
         </div>

@@ -3,10 +3,13 @@ import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import { execSync } from "node:child_process";
 import pkg from "./package.json" with { type: "json" };
+import node from "@astrojs/node";
 
 const { version } = pkg;
 
 export default defineConfig({
+  output: 'server',
+
   vite: {
     plugins: [tailwindcss()],
     define: {
@@ -17,6 +20,10 @@ export default defineConfig({
       HASH: JSON.stringify(getCommit()),
     },
   },
+
+  adapter: node({
+    mode: "middleware"
+  })
 });
 
 function getCommit() {

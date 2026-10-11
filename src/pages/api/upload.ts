@@ -68,7 +68,7 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
-  const storageKey = crypto.randomUUID(); // randomized file name bleh
+  const storageKey = crypto.randomUUID();
 
   // TODO: db shit uh oh
 

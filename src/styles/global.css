@@ -7,6 +7,7 @@
 @theme {
   --font-besley: "Besley", sans-serif;
   --font-jost: "Jost", sans-serif;
+  --color-blurple: #5865f2;
 }
 * {
   text-wrap: pretty;

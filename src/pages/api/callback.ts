@@ -101,10 +101,6 @@ export const GET: APIRoute = async ({ request, cookies, clientAddress }) => {
   const sessionId = crypto.randomUUID();
 
   const ip = getClientIp(request, clientAddress);
-  if (!ip) {
-    console.error("Could not determine client IP during login");
-    return loginError("ip_failed");
-  }
 
   db.prepare("DELETE FROM sessions WHERE discord_id = ?").run(me.id);
   db.prepare("INSERT INTO sessions (id, discord_id, username, avatar, access_token, refresh_token, expires_at, created_at, ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(sessionId, me.id, me.username, me.avatar, token.access_token, token.refresh_token ?? null, now + token.expires_in * 1000, now, ip);

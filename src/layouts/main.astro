@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import UserHeader from "../components/userheader.astro";
 import SiteFooter from "../components/sitefooter.astro";
-import { validateSession, type Session } from "../utils/session";
+import { validateSession, getPageClientIp, type Session } from "../utils/session";
 
 interface Props {
   title: string;
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { title, session: sessionProp } = Astro.props;
-const session = sessionProp !== undefined ? sessionProp : validateSession(Astro.request, Astro.cookies, Astro.clientAddress);
+const session = sessionProp !== undefined ? sessionProp : validateSession(Astro.request, Astro.cookies, getPageClientIp(Astro.request));
 ---
 
 <html lang="en">

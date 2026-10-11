@@ -48,25 +48,27 @@ export function getClientIp(request: Request, clientAddress?: string): string | 
     if (socketIp && isPublicIp(socketIp)) return socketIp;
   }
 
-  const headers = request.headers;
-  const edgeIp = headers.get("cf-connecting-ip")?.trim() || headers.get("true-client-ip")?.trim();
-  if (edgeIp) return normalizeIp(edgeIp);
+  const trustProxy = (import.meta.env.TRUST_PROXY as string | undefined) === "1" || (import.meta.env.TRUST_PROXY as string | undefined) === "true";
 
-  const forwarded = headers.get("x-forwarded-for");
-  if (forwarded) {
-    const chain = forwarded
-      .split(",")
-      .map((s) => normalizeIp(s))
-      .filter(Boolean);
-    const last = chain.pop();
-    if (last) return last;
+  if (trustProxy) {
+    const forwarded = request.headers.get("x-forwarded-for");
+    if (forwarded) {
+      const chain = forwarded
+        .split(",")
+        .map((s) => normalizeIp(s))
+        .filter(Boolean);
+      const last = chain.pop();
+      if (last) return last;
+    }
   }
-
-  const realIp = headers.get("x-real-ip")?.trim();
-  if (realIp) return normalizeIp(realIp);
 
   if (clientAddress) return normalizeIp(clientAddress);
   return null;
+}
+
+export function getPageClientIp(request: Request): string | undefined {
+  const v = Reflect.get(request, Symbol.for("astro.clientAddress"));
+  return typeof v === "string" ? v : undefined;
 }
 
 export function validateSession(request: Request, cookies: CookieJar, clientAddress?: string): Session | null {
@@ -82,7 +84,7 @@ export function validateSession(request: Request, cookies: CookieJar, clientAddr
   }
 
   const ip = getClientIp(request, clientAddress);
-  if (!ip || !session.ip || session.ip !== ip) return null;
+  if (session.ip && ip && session.ip !== ip) return null;
 
   return session;
 }

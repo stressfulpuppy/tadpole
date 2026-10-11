@@ -19,6 +19,7 @@
     "astro": "^7.3.8",
     "better-sqlite3": "^13.0.3",
     "busboy": "^1.6.0",
+    "lucide": "^1.27.0",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

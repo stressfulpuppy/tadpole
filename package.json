@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^11.1.7",
-    "@lucide/astro": "^1.54.0",
+    "lucide": "^1.27.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.8",
     "better-sqlite3": "^13.0.3",

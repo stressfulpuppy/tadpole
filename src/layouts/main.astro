@@ -2,7 +2,15 @@
 import "../styles/global.css";
 import UserHeader from "../components/userheader.astro";
 import SiteFooter from "../components/sitefooter.astro";
-const { title } = Astro.props;
+import { validateSession, type Session } from "../utils/session";
+
+interface Props {
+  title: string;
+  session?: Session | null;
+}
+
+const { title, session: sessionProp } = Astro.props;
+const session = sessionProp !== undefined ? sessionProp : validateSession(Astro.request, Astro.cookies, Astro.clientAddress);
 ---
 
 <html lang="en">
@@ -27,7 +35,7 @@ const { title } = Astro.props;
   </head>
   <body class="bg-ctp-base">
     <div class="relative flex min-h-dvh flex-col bg-ctp-base font-jost font-medium text-ctp-text">
-      <UserHeader />
+      <UserHeader session={session} />
       <main class="flex w-full flex-1 flex-col items-center px-5 sm:px-8">
         <slot />
       </main>

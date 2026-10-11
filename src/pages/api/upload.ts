@@ -1,5 +1,8 @@
 import type { APIRoute } from "astro";
-import { validateSession } from "../../utils/session";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import db from "../../utils/db";
+import { validateSession, getPublicOrigin } from "../../utils/session";
 
 const MAX_SIZE = 256 * 1024 * 1024;
 const UNALLOWED_EXTENSIONS = new Set(["exe", "scr", "cpl", "jar", "bat", "cmd", "com", "msi", "ps1", "vbs", "vbe", "js", "jse", "wsf", "wsh", "hta", "reg", "lnk", "doc", "docx"]);
@@ -75,8 +78,12 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
   }
 
   const storageKey = crypto.randomUUID();
+  const now = Date.now();
 
-  // TODO: db shit uh oh
+  mkdirSync("data/uploads", { recursive: true });
+  writeFileSync(join("data/uploads", storageKey), Buffer.from(await file.arrayBuffer()));
+
+  db.prepare("INSERT INTO files (id, discord_id, name, size, mime, created_at) VALUES (?, ?, ?, ?, ?, ?)").run(storageKey, session.discord_id, filename, file.size, file.type || null, now);
 
   return Response.json({
     success: true,
@@ -84,5 +91,6 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
     name: filename,
     size: file.size,
     type: file.type,
+    url: new URL(`/f/${storageKey}`, getPublicOrigin(request)).toString(),
   });
 };

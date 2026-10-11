@@ -30,20 +30,30 @@
         Admin Panel
       </a>
     </li>
+    <li class="my-1 border-t border-ctp-surface1"></li>
+    <li class="rounded-lg text-ctp-red hover:bg-ctp-surface1">
+      <a
+        class="block px-2 py-1"
+        href="/api/logout"
+      >
+        Log Out
+      </a>
+    </li>
   </ul>
 </div>
 
-<script>
+<script is:inline>
   const userContextElement = document.getElementById("userContext");
   const userContextMenu = document.getElementById("userContextMenu");
 
   userContextElement?.addEventListener("click", (event) => {
+    event.preventDefault();
     event.stopPropagation();
     userContextMenu?.classList.toggle("hidden");
   });
 
   document.addEventListener("click", (event) => {
-    if (userContextMenu && !userContextMenu.contains(event.target as Node) && !userContextElement?.contains(event.target as Node)) {
+    if (userContextMenu && !userContextMenu.contains(event.target) && !userContextElement?.contains(event.target)) {
       userContextMenu.classList.add("hidden");
     }
   });

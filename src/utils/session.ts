@@ -86,3 +86,28 @@ export function validateSession(request: Request, cookies: CookieJar, clientAddr
 
   return session;
 }
+
+export function getAvatarUrl(session: Pick<Session, "discord_id" | "avatar">, size = 64): string {
+  if (!session.avatar) {
+    return `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(session.discord_id) >> 22n) % 6}.png`;
+  }
+  const ext = session.avatar.startsWith("a_") ? "gif" : "png";
+  return `https://cdn.discordapp.com/avatars/${session.discord_id}/${session.avatar}.${ext}?size=${size}`;
+}
+
+export function getPublicOrigin(request: Request): string {
+  const fallback = new URL(request.url);
+  const proto = request.headers.get("x-forwarded-proto")?.split(",")[0].trim() || fallback.protocol.replace(":", "");
+  const host = request.headers.get("x-forwarded-host")?.split(",")[0].trim() || fallback.host;
+  return `${proto}://${host}`;
+}
+
+export function isSecureRequest(request: Request): boolean {
+  return getPublicOrigin(request).startsWith("https://");
+}
+
+export function getRedirectUri(request: Request): string {
+  const configured = import.meta.env.REDIRECT as string | undefined;
+  if (configured) return configured;
+  return new URL("/api/callback", getPublicOrigin(request)).toString();
+}

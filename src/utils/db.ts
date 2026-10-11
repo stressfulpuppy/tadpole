@@ -17,6 +17,15 @@ db.exec(`
     created_at INTEGER NOT NULL
   );
   CREATE INDEX IF NOT EXISTS idx_sessions_discord_id ON sessions (discord_id);
+  CREATE TABLE IF NOT EXISTS files (
+    id TEXT PRIMARY KEY,
+    discord_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    size INTEGER NOT NULL,
+    mime TEXT,
+    created_at INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_files_discord_id ON files (discord_id);
 `);
 
 const sessionColumns = db.prepare("PRAGMA table_info(sessions)").all() as { name: string }[];

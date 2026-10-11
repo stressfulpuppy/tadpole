@@ -1,4 +1,4 @@
-export type HASH = string;
-export type VERSION = string;
-export type TOTALGB = string;
-export type TOTALFILE = string;
+declare const HASH: string;
+declare const VERSION: string;
+declare const TOTALGB: string;
+declare const TOTALFILE: string;

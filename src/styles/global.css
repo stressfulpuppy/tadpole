@@ -8,3 +8,6 @@
   --font-besley: "Besley", sans-serif;
   --font-jost: "Jost", sans-serif;
 }
+* {
+  text-wrap: pretty;
+}

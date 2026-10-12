@@ -1,0 +1,84 @@
+---
+import Main from "../layouts/main.astro";
+import { Upload } from "@lucide/astro";
+---
+
+<!-- used some cladue here will have mr beacat make the code betterr :D  -->
+<Main title="tadpole - upload">
+  <div class="flex w-full flex-1 flex-col items-center justify-center py-20 text-center">
+    <!-- i kind of stole almost ALL of this from mdn :3 -->
+    <label
+      id="drop-zone"
+      class="flex justify-center flex-col gap-2 items-center width-[500px] height-200px p-4 border rounded-sm bg-red-400 text-ctp-text"
+    >
+      drop files here, or click to upload.
+      <input
+        class="hidden"
+        type="file"
+        id="file-input"
+        multiple
+        accept="image/*"
+      />
+      <Upload class="w-12 h-12" />
+    </label>
+    <ul
+      id="preview"
+      class="flex justify-center items-center gap-0.5 m-0 w-full h-25"
+    ></ul>
+  </div>
+</Main>
+<script>
+  async function showFiles(files) {
+    let lastUrl = null;
+
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) continue;
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          alert(await res.text());
+          continue;
+        }
+
+        const result = await res.json();
+        lastUrl = result.url;
+      } catch (err) {
+        alert("Upload failed");
+      }
+    }
+
+    if (lastUrl) {
+      window.location.href = lastUrl;
+    }
+  }
+
+  const dropZone = document.getElementById("drop-zone");
+  const fileInput = document.getElementById("file-input");
+
+  dropZone?.addEventListener("dragover", (e) => {
+    e.preventDefault();
+  });
+
+  dropZone?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    showFiles(e.dataTransfer.files);
+  });
+
+  window.addEventListener("drop", (e) => {
+    if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
+      e.preventDefault();
+    }
+  });
+
+  fileInput?.addEventListener("change", () => {
+    showFiles(fileInput.files);
+  });
+</script>

@@ -82,9 +82,6 @@ export function validateSession(request: Request, cookies: CookieJar, clientAddr
     return null;
   }
 
-  const ip = getClientIp(request, clientAddress);
-  if (session.ip && ip && session.ip !== ip) return null;
-
   return session;
 }
 

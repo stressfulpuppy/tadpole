@@ -1,4 +1,11 @@
 ---
+import type { Session } from "../utils/session";
+
+interface Props {
+  session?: Session | null;
+}
+
+const { session } = Astro.props;
 ---
 
 <div
@@ -22,14 +29,16 @@
         My Uploads
       </a>
     </li>
-    <li class="rounded-lg hover:bg-ctp-surface1">
-      <a
-        class="block px-2 py-1"
-        href="/admin"
-      >
-        Admin Panel
-      </a>
-    </li>
+    {session?.role === "admin" && (
+      <li class="rounded-lg hover:bg-ctp-surface1">
+        <a
+          class="block px-2 py-1"
+          href="/admin"
+        >
+          Admin Panel
+        </a>
+      </li>
+    )}
     <li class="my-1 border-t border-ctp-surface1"></li>
     <li class="rounded-lg text-ctp-red hover:bg-ctp-surface1">
       <a

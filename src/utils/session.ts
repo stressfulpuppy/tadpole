@@ -75,7 +75,7 @@ export function validateSession(request: Request, cookies: CookieJar, clientAddr
   const sessionId = cookies.get("tadpole_session")?.value;
   if (!sessionId) return null;
 
-  const session = db.prepare("SELECT id, discord_id, username, avatar, access_token, refresh_token, expires_at, created_at, ip FROM sessions WHERE id = ?").get(sessionId) as Session | undefined;
+  const session = db.prepare("SELECT s.id, s.discord_id, s.username, s.avatar, s.access_token, s.refresh_token, s.expires_at, s.created_at, s.ip, COALESCE(u.role, 'user') AS role FROM sessions s LEFT JOIN users u ON u.discord_id = s.discord_id WHERE s.id = ?").get(sessionId) as Session | undefined;
   if (!session) return null;
 
   if (session.expires_at <= Date.now()) {

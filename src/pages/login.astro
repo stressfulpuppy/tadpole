@@ -1,7 +1,10 @@
 ---
 import Main from "../layouts/main.astro";
 import { LogIn, TriangleAlert } from "@lucide/astro";
+import { validateSession, getPageClientIp } from "../utils/session";
 
+const session = validateSession(Astro.request, Astro.cookies, getPageClientIp(Astro.request));
+if (session) return Astro.redirect("/"); // already logged in, redirect to home
 const error = Astro.url.searchParams.get("error");
 ---
 

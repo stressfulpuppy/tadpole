@@ -103,6 +103,11 @@ export const GET: APIRoute = async ({ request, cookies, clientAddress }) => {
   const ip = getClientIp(request, clientAddress);
 
   db.prepare("DELETE FROM sessions WHERE discord_id = ?").run(me.id);
+  db.prepare("INSERT INTO users (discord_id, role, created_at) VALUES (?, 'user', ?) ON CONFLICT(discord_id) DO NOTHING").run(me.id, now);
+  const adminIds = ((import.meta.env.ADMIN_IDS as string | undefined) ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (adminIds.includes(me.id)) {
+    db.prepare("UPDATE users SET role = 'admin' WHERE discord_id = ?").run(me.id);
+  }
   db.prepare("INSERT INTO sessions (id, discord_id, username, avatar, access_token, refresh_token, expires_at, created_at, ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)").run(sessionId, me.id, me.username, me.avatar, token.access_token, token.refresh_token ?? null, now + token.expires_in * 1000, now, ip);
 
   const secure = isSecureRequest(request, clientAddress);

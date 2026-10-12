@@ -22,7 +22,7 @@ const isLoginPage = Astro.url.pathname === "/login";
       >
         <div class="flex flex-col justify-center text-right">
           <span class="text-base font-semibold leading-tight text-ctp-text sm:text-lg">@{session.username ?? "user"}</span>
-          <span class="mt-0.5 text-sm font-normal leading-tight text-ctp-subtext1">user</span>
+          <span class="mt-0.5 text-sm font-normal leading-tight text-ctp-subtext1">{session.role}</span>
         </div>
         <img
           src={avatarUrl}
@@ -55,6 +55,6 @@ const isLoginPage = Astro.url.pathname === "/login";
       </a>
     )}
 
-    {session && <UserPopup />}
+    {session && <UserPopup session={session} />}
   </div>
 </div>

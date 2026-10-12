@@ -1,7 +1,7 @@
 ---
 import Main from "../layouts/main.astro";
-import db from "../utils/db";
-import { validateSession, getPageClientIp } from "../utils/session";
+import db from "../server/db";
+import { validateSession, getPageClientIp } from "../server/session";
 
 const session = validateSession(Astro.request, Astro.cookies, getPageClientIp(Astro.request));
 if (!session) return Astro.redirect("/login");

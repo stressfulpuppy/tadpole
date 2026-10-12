@@ -1,14 +1,14 @@
 ---
 import UserPopup from "./userpopup.astro";
 import { UserRound } from "@lucide/astro";
-import { getAvatarUrl, type Session } from "../utils/session";
+import { getAvatarUrl, type Session } from "../server/session";
 
 interface Props {
   session?: Session | null;
 }
 
 const { session } = Astro.props;
-const avatarUrl = session ? getAvatarUrl(session, 80) : null;
+const avatarUrl = session ? getAvatarUrl(session, 64) : null;
 const isLoginPage = Astro.url.pathname === "/login";
 ---
 

@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import UserHeader from "../components/userheader.astro";
 import SiteFooter from "../components/sitefooter.astro";
-import { validateSession, getPageClientIp, type Session } from "../utils/session";
+import { validateSession, getPageClientIp, type Session } from "../server/session";
 
 interface Props {
   title: string;

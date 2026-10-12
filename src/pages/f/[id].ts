@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro";
-import { createReadStream, statSync } from "node:fs";
+import { createReadStream } from "node:fs";
+import { stat } from "node:fs/promises";
 import { join } from "node:path";
 import { Readable } from "node:stream";
-import db from "../../utils/db";
+import db from "../../server/db";
 
 interface FileRow {
   id: string;
@@ -13,7 +14,7 @@ interface FileRow {
   created_at: number;
 }
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params, request }) => {
   const id = params.id ?? "";
 
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
@@ -29,21 +30,45 @@ export const GET: APIRoute = async ({ params }) => {
 
   let size: number;
   try {
-    size = statSync(path).size;
+    size = (await stat(path)).size;
   } catch {
     return new Response("Not found", { status: 404 });
   }
 
   const safeName = row.name.replace(/["\\\r\n]/g, "_");
+  const encodedName = encodeURIComponent(row.name);
 
-  return new Response(Readable.toWeb(createReadStream(path)) as ReadableStream, {
-    headers: {
-      "Content-Type": row.mime || "application/octet-stream",
-      "Content-Length": String(size),
-      "Content-Disposition": `inline; filename="${safeName}"`,
-      "Content-Security-Policy": "sandbox",
-      "Cache-Control": "public, max-age=31536000, immutable",
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
+  const headers: Record<string, string> = {
+    "Content-Type": row.mime || "application/octet-stream",
+    "Content-Disposition": `inline; filename="${safeName}"; filename*=UTF-8''${encodedName}`,
+    "Content-Security-Policy": "sandbox",
+    "Cache-Control": "public, max-age=31536000, immutable",
+    "X-Content-Type-Options": "nosniff",
+    "Accept-Ranges": "bytes",
+  };
+
+  const range = request.headers.get("range");
+  if (range) {
+    const match = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
+    if (match) {
+      let start = match[1] === "" ? size - Number(match[2]) : Number(match[1]);
+      let end = match[2] === "" ? size - 1 : Number(match[2]);
+      if (Number.isInteger(start) && Number.isInteger(end) && start >= 0 && end >= start && start < size) {
+        end = Math.min(end, size - 1);
+        headers["Content-Range"] = `bytes ${start}-${end}/${size}`;
+        headers["Content-Length"] = String(end - start + 1);
+        return new Response(Readable.toWeb(createReadStream(path, { start, end })) as ReadableStream, {
+          status: 206,
+          headers,
+        });
+      }
+      return new Response("Range not satisfiable", {
+        status: 416,
+        headers: { "Content-Range": `bytes */${size}` },
+      });
+    }
+  }
+
+  headers["Content-Length"] = String(size);
+  return new Response(Readable.toWeb(createReadStream(path)) as ReadableStream, { headers });
 };

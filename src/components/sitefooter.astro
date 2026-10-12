@@ -1,4 +1,17 @@
 ---
+import db from "../server/db";
+
+const stats = db.prepare("SELECT COUNT(*) AS count, COALESCE(SUM(size), 0) AS size FROM files").get() as {
+  count: number;
+  size: number;
+};
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
 ---
 
 <footer class="w-full pb-2 pt-3 text-center text-xs font-normal leading-relaxed text-ctp-subtext0 sm:pb-3 sm:pt-4 sm:text-sm">
@@ -13,20 +26,14 @@
       {VERSION}
     </a>
     <span class="text-ctp-overlay0">·</span>
-    <span
-      id="sumcount"
-      class="font-medium text-ctp-text"
-    >
-      1,234
+    <span class="font-medium text-ctp-text">
+      {stats.count.toLocaleString()}
     </span>
     <span>files uploaded</span>
     <span class="text-ctp-overlay0">·</span>
     <span>using</span>
-    <span
-      id="sumsize"
-      class="font-medium text-ctp-text"
-    >
-      56.78 GB
+    <span class="font-medium text-ctp-text">
+      {formatSize(stats.size)}
     </span>
   </p>
 

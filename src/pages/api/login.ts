@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getRedirectUri, isSecureRequest } from "../../utils/session";
+import { getRedirectUri, isSecureRequest } from "../../server/session";
 
 export const GET: APIRoute = async ({ request, cookies, clientAddress }) => {
   const clientId = import.meta.env.CLIENTID;

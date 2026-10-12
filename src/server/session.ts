@@ -10,6 +10,7 @@ export interface Session {
   expires_at: number;
   created_at: number;
   ip: string | null;
+  role: string;
 }
 
 interface CookieJar {
@@ -82,12 +83,24 @@ export function validateSession(request: Request, cookies: CookieJar, clientAddr
     return null;
   }
 
+  const ip = clientAddress ?? null;
+  if (ip !== null && ip !== session.ip) {
+    db.prepare("UPDATE sessions SET ip = ? WHERE id = ?").run(ip, sessionId);
+    session.ip = ip;
+  }
+
   return session;
 }
 
 export function getAvatarUrl(session: Pick<Session, "discord_id" | "avatar">, size = 64): string {
   if (!session.avatar) {
-    return `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(session.discord_id) >> 22n) % 6}.png`;
+    let index = 0;
+    try {
+      index = Number((BigInt(session.discord_id) >> 22n) % 6n);
+    } catch {
+      index = 0;
+    }
+    return `https://cdn.discordapp.com/embed/avatars/${index}.png`;
   }
   const ext = session.avatar.startsWith("a_") ? "gif" : "png";
   return `https://cdn.discordapp.com/avatars/${session.discord_id}/${session.avatar}.${ext}?size=${size}`;

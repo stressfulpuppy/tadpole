@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import db from "../../utils/db";
+import db from "../../server/db";
 
 function logout(cookies: Parameters<APIRoute>[0]["cookies"]) {
   const sessionId = cookies.get("tadpole_session")?.value;

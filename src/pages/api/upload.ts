@@ -3,8 +3,8 @@ import Busboy from "busboy";
 import { createWriteStream, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { Readable } from "node:stream";
-import db from "../../utils/db";
-import { validateSession, getPublicOrigin } from "../../utils/session";
+import db from "../../server/db";
+import { validateSession, getPublicOrigin } from "../../server/session";
 
 const MAX_SIZE = 256 * 1024 * 1024;
 const UNALLOWED_EXTENSIONS = new Set(["exe", "scr", "cpl", "jar", "bat", "cmd", "com", "msi", "ps1", "vbs", "vbe", "js", "jse", "wsf", "wsh", "hta", "reg", "lnk", "doc", "docx"]);

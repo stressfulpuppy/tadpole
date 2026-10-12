@@ -43,23 +43,22 @@ export function isPublicIp(ip: string): boolean {
 }
 
 export function getClientIp(request: Request, clientAddress?: string): string | null {
-  if (clientAddress) {
-    const socketIp = normalizeIp(clientAddress);
-    if (socketIp && isPublicIp(socketIp)) return socketIp;
-  }
-
   const trustProxy = (import.meta.env.TRUST_PROXY as string | undefined) === "1" || (import.meta.env.TRUST_PROXY as string | undefined) === "true";
 
   if (trustProxy) {
     const forwarded = request.headers.get("x-forwarded-for");
     if (forwarded) {
-      const chain = forwarded
+      const first = forwarded
         .split(",")
         .map((s) => normalizeIp(s))
-        .filter(Boolean);
-      const last = chain.pop();
-      if (last) return last;
+        .find(Boolean);
+      if (first) return first;
     }
+  }
+
+  if (clientAddress) {
+    const socketIp = normalizeIp(clientAddress);
+    if (socketIp && isPublicIp(socketIp)) return socketIp;
   }
 
   if (clientAddress) return normalizeIp(clientAddress);
@@ -97,12 +96,15 @@ export function getAvatarUrl(session: Pick<Session, "discord_id" | "avatar">, si
   return `https://cdn.discordapp.com/avatars/${session.discord_id}/${session.avatar}.${ext}?size=${size}`;
 }
 
-export function getPublicOrigin(request: Request, clientAddress?: string): string {
-  const fallback = new URL(request.url);
-  const direct = clientAddress ? normalizeIp(clientAddress) : "";
-  const viaProxy = !direct || !isPublicIp(direct);
-  const proto = (viaProxy ? request.headers.get("x-forwarded-proto")?.split(",")[0].trim() : "") || fallback.protocol.replace(":", "");
-  const host = (viaProxy ? request.headers.get("x-forwarded-host")?.split(",")[0].trim() : "") || fallback.host;
+export function getPublicOrigin(request: Request, _clientAddress?: string): string {
+  const configuredOrigin = (import.meta.env.ORIGIN as string | undefined)?.trim().replace(/\/$/, "");
+  if (configuredOrigin) return configuredOrigin;
+
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0].trim();
+  const hostHeader = request.headers.get("host")?.split(",")[0].trim();
+  const host = forwardedHost || hostHeader || new URL(request.url).host;
+  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0].trim();
+  const proto = forwardedProto || new URL(request.url).protocol.replace(":", "");
   return `${proto}://${host}`;
 }
 

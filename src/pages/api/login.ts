@@ -27,5 +27,8 @@ export const GET: APIRoute = async ({ request, cookies, clientAddress }) => {
   authorize.searchParams.set("scope", "identify");
   authorize.searchParams.set("state", state);
 
-  return Response.redirect(authorize.toString(), 302);
+  return new Response(null, {
+    status: 302,
+    headers: { Location: authorize.toString() },
+  });
 };

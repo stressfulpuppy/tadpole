@@ -1,20 +1,22 @@
 import type { APIRoute } from "astro";
 import db from "../../utils/db";
-import { getPublicOrigin } from "../../utils/session";
 
-function logout(cookies: Parameters<APIRoute>[0]["cookies"], request: Request, clientAddress?: string) {
+function logout(cookies: Parameters<APIRoute>[0]["cookies"]) {
   const sessionId = cookies.get("tadpole_session")?.value;
   if (sessionId) {
     db.prepare("DELETE FROM sessions WHERE id = ?").run(sessionId);
   }
   cookies.delete("tadpole_session", { path: "/" });
-  return Response.redirect(new URL("/", getPublicOrigin(request, clientAddress)).toString(), 302);
+  return new Response(null, {
+    status: 302,
+    headers: { Location: "/" },
+  });
 }
 
-export const GET: APIRoute = async ({ request, cookies, clientAddress }) => {
-  return logout(cookies, request, clientAddress);
+export const GET: APIRoute = async ({ cookies }) => {
+  return logout(cookies);
 };
 
-export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
-  return logout(cookies, request, clientAddress);
+export const POST: APIRoute = async ({ cookies }) => {
+  return logout(cookies);
 };

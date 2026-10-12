@@ -8,17 +8,22 @@
   "scripts": {
     "dev": "npx astro preferences disable devToolbar && astro dev",
     "build": "astro build",
+    "start": "node --experimental-strip-types ./index.ts",
     "preview": "astro preview",
     "astro": "astro",
     "format": "prettier --write ."
   },
   "dependencies": {
     "@astrojs/node": "^11.1.7",
+    "@fastify/compress": "^9.2.1",
+    "@fastify/helmet": "^13.1.2",
+    "@fastify/static": "^10.1.6",
     "@lucide/astro": "^1.55.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.8",
     "better-sqlite3": "^13.0.3",
     "busboy": "^1.6.0",
+    "fastify": "^5.12.5",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
@@ -28,6 +33,7 @@
     "@types/node": "^26.6.5",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.1",
-    "prettier-plugin-tailwindcss": "^0.8.1"
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "typescript": "^7.0.2"
   }
 }

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import db from "../../utils/db";
-import { getClientIp, getPublicOrigin, getRedirectUri, isSecureRequest } from "../../utils/session";
+import { getClientIp, getRedirectUri, isSecureRequest } from "../../utils/session";
 
 interface TokenResponse {
   access_token: string;
@@ -19,12 +19,15 @@ interface DiscordUser {
 // both signup & login goes through here
 export const GET: APIRoute = async ({ request, cookies, clientAddress }) => {
   const url = new URL(request.url);
-  const origin = getPublicOrigin(request, clientAddress);
   const code = url.searchParams.get("code");
   const returnedState = url.searchParams.get("state");
   const oauthError = url.searchParams.get("error");
 
-  const loginError = (reason: string) => Response.redirect(new URL("/login?error=" + encodeURIComponent(reason), origin).toString(), 302);
+  const loginError = (reason: string) =>
+    new Response(null, {
+      status: 302,
+      headers: { Location: "/login?error=" + encodeURIComponent(reason) },
+    });
 
   if (oauthError) {
     return loginError(oauthError);
@@ -120,5 +123,8 @@ export const GET: APIRoute = async ({ request, cookies, clientAddress }) => {
     secure,
   });
 
-  return Response.redirect(new URL("/", origin).toString(), 302);
+  return new Response(null, {
+    status: 302,
+    headers: { Location: "/" },
+  });
 };

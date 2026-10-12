@@ -34,7 +34,7 @@ const session = sessionProp !== undefined ? sessionProp : validateSession(Astro.
     </title>
   </head>
   <body class="bg-ctp-base">
-    <div class="relative flex min-h-dvh flex-col bg-ctp-base font-jost font-medium text-ctp-text">
+    <div class="flex min-h-dvh flex-col bg-ctp-base font-jost font-medium text-ctp-text">
       <UserHeader session={session} />
       <main class="flex w-full flex-1 flex-col items-center px-5 sm:px-8">
         <slot />

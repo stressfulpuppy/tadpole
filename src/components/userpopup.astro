@@ -1,4 +1,5 @@
 ---
+import { Settings, Images, ShieldCheck, LogOut } from "@lucide/astro";
 import type { Session } from "../utils/session";
 
 interface Props {
@@ -10,42 +11,51 @@ const { session } = Astro.props;
 
 <div
   id="userContextMenu"
-  class="absolute right-0 top-full mt-2 hidden w-48 rounded-xl bg-ctp-surface0 p-2"
+  role="menu"
+  class="absolute right-0 top-full z-20 mt-2 hidden w-52 rounded-lg border border-ctp-surface1 bg-ctp-surface0 p-1.5 shadow-lg"
 >
-  <ul>
-    <li class="rounded-lg hover:bg-ctp-surface1">
+  <ul class="text-sm font-normal">
+    <li>
       <a
-        class="block px-2 py-1"
         href="/settings"
+        role="menuitem"
+        class="flex items-center gap-2.5 rounded-md px-3 py-2 text-ctp-text transition-colors hover:bg-ctp-surface1"
       >
-        Account Settings
+        <Settings class="h-4 w-4 shrink-0 text-ctp-subtext0" />
+        <span>account settings</span>
       </a>
     </li>
-    <li class="rounded-lg hover:bg-ctp-surface1">
+    <li>
       <a
-        class="block px-2 py-1"
         href="/uploads"
+        role="menuitem"
+        class="flex items-center gap-2.5 rounded-md px-3 py-2 text-ctp-text transition-colors hover:bg-ctp-surface1"
       >
-        My Uploads
+        <Images class="h-4 w-4 shrink-0 text-ctp-subtext0" />
+        <span>my uploads</span>
       </a>
     </li>
     {session?.role === "admin" && (
-      <li class="rounded-lg hover:bg-ctp-surface1">
+      <li>
         <a
-          class="block px-2 py-1"
           href="/admin"
+          role="menuitem"
+          class="flex items-center gap-2.5 rounded-md px-3 py-2 text-ctp-text transition-colors hover:bg-ctp-surface1"
         >
-          Admin Panel
+          <ShieldCheck class="h-4 w-4 shrink-0 text-ctp-subtext0" />
+          <span>admin panel</span>
         </a>
       </li>
     )}
     <li class="my-1 border-t border-ctp-surface1"></li>
-    <li class="rounded-lg text-ctp-red hover:bg-ctp-surface1">
+    <li>
       <a
-        class="block px-2 py-1"
         href="/api/logout"
+        role="menuitem"
+        class="flex items-center gap-2.5 rounded-md px-3 py-2 text-ctp-red transition-colors hover:bg-ctp-surface1"
       >
-        Log Out
+        <LogOut class="h-4 w-4 shrink-0" />
+        <span>log out</span>
       </a>
     </li>
   </ul>
@@ -55,21 +65,24 @@ const { session } = Astro.props;
   const userContextElement = document.getElementById("userContext");
   const userContextMenu = document.getElementById("userContextMenu");
 
+  function setMenu(open) {
+    userContextMenu?.classList.toggle("hidden", !open);
+    userContextElement?.setAttribute("aria-expanded", String(open));
+  }
+
   userContextElement?.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    userContextMenu?.classList.toggle("hidden");
+    setMenu(userContextMenu?.classList.contains("hidden") ?? false);
   });
 
   document.addEventListener("click", (event) => {
     if (userContextMenu && !userContextMenu.contains(event.target) && !userContextElement?.contains(event.target)) {
-      userContextMenu.classList.add("hidden");
+      setMenu(false);
     }
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      userContextMenu?.classList.add("hidden");
-    }
+    if (event.key === "Escape") setMenu(false);
   });
 </script>

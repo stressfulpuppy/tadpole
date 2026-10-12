@@ -1,84 +1,330 @@
 ---
 import Main from "../layouts/main.astro";
-import { Upload } from "@lucide/astro";
+import { Upload, TriangleAlert, File as FileIcon } from "@lucide/astro";
+import { validateSession, getPageClientIp } from "../utils/session";
+
+const session = validateSession(Astro.request, Astro.cookies, getPageClientIp(Astro.request));
+if (!session) return Astro.redirect("/login");
 ---
 
-<!-- used some cladue here will have mr beacat make the code betterr :D  -->
 <Main title="tadpole - upload">
-  <div class="flex w-full flex-1 flex-col items-center justify-center py-20 text-center">
-    <!-- i kind of stole almost ALL of this from mdn :3 -->
+  <div class="flex w-full max-w-xl flex-1 flex-col items-center justify-center py-20 text-center">
+    <h1 class="bg-linear-50 bg-clip-text pb-[0.25em] pr-[0.08em] font-besley text-5xl font-bold italic leading-none tracking-tight text-transparent from-ctp-green to-ctp-teal sm:text-6xl">upload</h1>
+    <p class="mt-3 max-w-xl text-base font-normal leading-relaxed text-ctp-subtext0 sm:text-lg">drop files anywhere below, or browse your device.</p>
+
+    <div
+      id="upload-error"
+      class="mt-6 hidden w-full items-start gap-2 rounded-lg border border-ctp-red/40 bg-ctp-red/10 px-4 py-3 text-left text-sm font-normal"
+    >
+      <TriangleAlert class="mt-0.5 h-4 w-4 shrink-0 text-ctp-red" />
+      <p
+        id="upload-error-text"
+        class="min-w-0 flex-1 break-words text-ctp-text"
+      ></p>
+    </div>
+
     <label
       id="drop-zone"
-      class="flex justify-center flex-col gap-2 items-center width-[500px] height-200px p-4 border rounded-sm bg-red-400 text-ctp-text"
+      for="file-input"
+      class="mt-6 flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-ctp-surface1 bg-ctp-surface0 px-6 py-14 transition-colors hover:border-ctp-overlay0 hover:bg-ctp-surface1 focus-within:border-ctp-overlay0 has-[input:focus-visible]:outline has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-ctp-green"
     >
-      drop files here, or click to upload.
+      <span class="flex h-14 w-14 items-center justify-center rounded-full bg-ctp-surface1 text-ctp-subtext0">
+        <Upload class="h-6 w-6" />
+      </span>
+      <span class="mt-2 text-base font-medium text-ctp-text">drag &amp; drop files here</span>
+      <span class="text-sm font-normal text-ctp-subtext0">or</span>
+      <span class="flex h-11 items-center justify-center gap-2 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-4 text-center text-ctp-text">
+        <FileIcon class="h-4 w-4" />
+        <span>browse files...</span>
+      </span>
+      <span class="mt-1 text-sm font-normal text-ctp-subtext0">any file · up to 256 MB each</span>
       <input
-        class="hidden"
-        type="file"
         id="file-input"
+        class="sr-only"
+        type="file"
         multiple
-        accept="image/*"
       />
-      <Upload class="w-12 h-12" />
     </label>
-    <ul
-      id="preview"
-      class="flex justify-center items-center gap-0.5 m-0 w-full h-25"
-    ></ul>
+
+    <div
+      id="queue-wrap"
+      class="mt-4 hidden w-full text-left"
+    >
+      <div class="flex items-center justify-between gap-3 px-1">
+        <p class="text-sm font-normal text-ctp-subtext0">
+          <span
+            id="queue-count"
+            class="font-medium text-ctp-text"
+          >0</span> uploading
+        </p>
+        <button
+          id="queue-clear"
+          type="button"
+          class="text-sm font-normal text-ctp-subtext0 underline-offset-4 transition-colors hover:text-ctp-text hover:underline"
+        >
+          clear finished
+        </button>
+      </div>
+      <ul
+        id="preview"
+        class="mt-2 flex w-full flex-col gap-2"
+      ></ul>
+    </div>
+
+    <a
+      href="/"
+      class="mt-6 text-sm font-normal text-ctp-subtext0 underline-offset-4 transition-colors hover:text-ctp-text hover:underline"
+    >
+      back home
+    </a>
   </div>
 </Main>
+
 <script>
-  async function showFiles(files) {
-    let lastUrl = null;
+  const dropZone = document.getElementById("drop-zone") as HTMLLabelElement | null;
+  const fileInput = document.getElementById("file-input") as HTMLInputElement | null;
+  const queueWrap = document.getElementById("queue-wrap");
+  const queueCount = document.getElementById("queue-count");
+  const queueClear = document.getElementById("queue-clear");
+  const preview = document.getElementById("preview") as HTMLUListElement | null;
+  const errorBox = document.getElementById("upload-error");
+  const errorText = document.getElementById("upload-error-text");
+  let dragDepth = 0;
+  let uploading = false;
+  let totalCount = 0;
+  let doneCount = 0;
 
-    for (const file of files) {
-      if (!file.type.startsWith("image/")) continue;
+  function showError(message: string) {
+    if (!errorBox || !errorText) return;
+    errorText.textContent = message;
+    errorBox.classList.remove("hidden");
+    errorBox.classList.add("flex");
+  }
 
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
+  function clearError() {
+    if (!errorBox || !errorText) return;
+    errorText.textContent = "";
+    errorBox.classList.add("hidden");
+    errorBox.classList.remove("flex");
+  }
 
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
+  function formatSize(bytes: number): string {
+    if (!Number.isFinite(bytes)) return "";
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+  }
 
-        if (!res.ok) {
-          alert(await res.text());
-          continue;
+  function setDragging(active: boolean) {
+    if (!dropZone) return;
+    dropZone.classList.toggle("border-ctp-green", active);
+    dropZone.classList.toggle("bg-ctp-surface1", active);
+  }
+
+  function updateCount() {
+    if (queueWrap) queueWrap.classList.remove("hidden");
+    if (queueCount) queueCount.textContent = `${doneCount}/${totalCount}`;
+  }
+
+  function uploadOne(file: File, onProgress: (pct: number) => void): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/upload");
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100));
+      });
+      xhr.addEventListener("load", () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            resolve((JSON.parse(xhr.responseText) as { url: string }).url);
+          } catch {
+            reject(new Error("bad server response"));
+          }
+        } else {
+          reject(new Error(xhr.responseText || `upload failed (${xhr.status})`));
         }
+      });
+      xhr.addEventListener("error", () => reject(new Error("network error")));
+      const formData = new FormData();
+      formData.append("file", file);
+      xhr.send(formData);
+    });
+  }
 
-        const result = await res.json();
-        lastUrl = result.url;
+  function addRow(file: File): {
+    bar: HTMLDivElement | null;
+    status: HTMLSpanElement | null;
+    actions: HTMLDivElement | null;
+    markDone: (url: string) => void;
+    markFailed: () => void;
+  } {
+    const row = document.createElement("li");
+    row.className =
+      "flex w-full items-center gap-3 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-3 py-2.5 text-left text-sm";
+    row.dataset.done = "0";
+
+    const thumb = document.createElement(file.type.startsWith("image/") ? "img" : "span");
+    if (thumb instanceof HTMLImageElement) {
+      thumb.src = URL.createObjectURL(file);
+      thumb.alt = "";
+      thumb.className = "h-10 w-10 shrink-0 rounded-md object-cover";
+    } else {
+      thumb.className =
+        "flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-ctp-surface1 text-ctp-subtext0";
+      thumb.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>';
+    }
+
+    const middle = document.createElement("div");
+    middle.className = "min-w-0 flex-1";
+    const top = document.createElement("div");
+    top.className = "flex items-baseline justify-between gap-2";
+    const name = document.createElement("span");
+    name.className = "min-w-0 flex-1 truncate font-normal text-ctp-text";
+    name.textContent = file.name;
+    name.title = file.name;
+    const status = document.createElement("span");
+    status.className = "shrink-0 font-normal text-ctp-subtext0";
+    status.textContent = "0%";
+    top.append(name, status);
+    const track = document.createElement("div");
+    track.className = "mt-1.5 h-1 w-full overflow-hidden rounded-full bg-ctp-surface1";
+    const bar = document.createElement("div");
+    bar.className = "h-full w-0 rounded-full bg-ctp-green transition-[width]";
+    bar.style.width = "0%";
+    track.append(bar);
+    const sub = document.createElement("p");
+    sub.className = "mt-1 truncate text-xs font-normal text-ctp-subtext0";
+    sub.textContent = formatSize(file.size);
+    middle.append(top, track, sub);
+
+    const actions = document.createElement("div");
+    actions.className = "hidden shrink-0 items-center gap-1";
+
+    row.append(thumb, middle, actions);
+    preview?.append(row);
+    updateCount();
+
+    function markDone(url: string) {
+      row.dataset.done = "1";
+      bar.style.width = "100%";
+      status.textContent = "done";
+      status.classList.replace("text-ctp-subtext0", "text-ctp-green");
+      sub.innerHTML = "";
+      const open = document.createElement("a");
+      open.href = url;
+      open.target = "_blank";
+      open.rel = "noopener noreferrer";
+      open.title = "open file";
+      open.className =
+        "flex h-8 w-8 items-center justify-center rounded-md text-ctp-subtext0 transition-colors hover:bg-ctp-surface1 hover:text-ctp-text";
+      open.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>';
+      const copy = document.createElement("button");
+      copy.type = "button";
+      copy.title = "copy link";
+      copy.className =
+        "flex h-8 w-8 items-center justify-center rounded-md text-ctp-subtext0 transition-colors hover:bg-ctp-surface1 hover:text-ctp-text";
+      copy.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+      copy.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        try {
+          await navigator.clipboard.writeText(new URL(url, window.location.origin).href);
+          copy.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-ctp-green"><path d="M20 6 9 17l-5-5"/></svg>';
+          setTimeout(() => {
+            copy.innerHTML =
+              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+          }, 1500);
+        } catch {
+          showError("could not copy link to clipboard.");
+        }
+      });
+      actions.append(open, copy);
+      actions.classList.remove("hidden");
+      actions.classList.add("flex");
+      row.classList.add("cursor-pointer", "hover:border-ctp-overlay0");
+      row.addEventListener("click", () => window.open(url, "_blank"));
+    }
+
+    function markFailed() {
+      row.dataset.done = "1";
+      bar.classList.replace("bg-ctp-green", "bg-ctp-red");
+      status.textContent = "failed";
+      status.classList.replace("text-ctp-subtext0", "text-ctp-red");
+    }
+
+    return { bar, status, actions, markDone, markFailed };
+  }
+
+  async function uploadFiles(files: FileList | File[] | null | undefined) {
+    if (!files || files.length === 0 || uploading) return;
+    clearError();
+    uploading = true;
+    totalCount += files.length;
+    updateCount();
+
+    for (const file of Array.from(files)) {
+      const { bar, status, markDone, markFailed } = addRow(file);
+      try {
+        const url = await uploadOne(file, (pct) => {
+          if (bar) bar.style.width = `${pct}%`;
+          if (status) status.textContent = `${pct}%`;
+        });
+        markDone(url);
       } catch (err) {
-        alert("Upload failed");
+        markFailed();
+        showError(err instanceof Error ? err.message : `upload failed for "${file.name}".`);
+      } finally {
+        doneCount += 1;
+        updateCount();
       }
     }
 
-    if (lastUrl) {
-      window.location.href = lastUrl;
-    }
+    uploading = false;
+    if (fileInput) fileInput.value = "";
   }
 
-  const dropZone = document.getElementById("drop-zone");
-  const fileInput = document.getElementById("file-input");
+  queueClear?.addEventListener("click", () => {
+    preview?.querySelectorAll('li[data-done="1"]').forEach((el) => el.remove());
+    if (preview && preview.children.length === 0) {
+      queueWrap?.classList.add("hidden");
+      totalCount = 0;
+      doneCount = 0;
+    }
+  });
 
-  dropZone?.addEventListener("dragover", (e) => {
+  dropZone?.addEventListener("dragenter", (e) => {
     e.preventDefault();
+    dragDepth += 1;
+    setDragging(true);
+  });
+
+  dropZone?.addEventListener("dragover", (e) => e.preventDefault());
+
+  dropZone?.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) setDragging(false);
   });
 
   dropZone?.addEventListener("drop", (e) => {
     e.preventDefault();
-    showFiles(e.dataTransfer.files);
+    dragDepth = 0;
+    setDragging(false);
+    uploadFiles(e.dataTransfer?.files);
+  });
+
+  // stop the browser from navigating away if files are dropped outside the zone
+  window.addEventListener("dragover", (e) => {
+    if ([...e.dataTransfer?.items ?? []].some((item) => item.kind === "file")) e.preventDefault();
   });
 
   window.addEventListener("drop", (e) => {
-    if ([...e.dataTransfer.items].some((item) => item.kind === "file")) {
-      e.preventDefault();
-    }
+    if ([...e.dataTransfer?.items ?? []].some((item) => item.kind === "file")) e.preventDefault();
   });
 
-  fileInput?.addEventListener("change", () => {
-    showFiles(fileInput.files);
-  });
+  fileInput?.addEventListener("change", () => uploadFiles(fileInput.files));
 </script>

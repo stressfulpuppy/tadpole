@@ -1,4 +1,4 @@
-<img src=public/tadpole.svg alt="the tadpole wordmark" width=500>
+<img src=public/tadpole.svg alt="the tadpole wordmark" width=384>
 
 # stressfulpuppy/tadpole
 

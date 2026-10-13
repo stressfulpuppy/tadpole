@@ -87,7 +87,16 @@ export function mimeForFilename(filename: string): string | null {
   return EXT_MIME[filename.slice(dot + 1).toLowerCase()] ?? null;
 }
 
+const PLAINTEXT = new Set(["html", "htm", "xhtml", "shtml", "shtm", "stm", "svg", "svgz", "xml", "xsl", "xslt", "dtd"]);
+
+export function isPlaintextOnly(filename: string): boolean {
+  const dot = filename.lastIndexOf(".");
+  if (dot < 0 || dot === filename.length - 1) return false;
+  return PLAINTEXT.has(filename.slice(dot + 1).toLowerCase());
+}
+
 export function resolveServeMime(filename: string, stored: string | null): string {
+  if (isPlaintextOnly(filename)) return "text/plain; charset=utf-8";
   const byExt = mimeForFilename(filename);
   if (byExt) return byExt;
   if (stored && stored !== "application/octet-stream") return stored;
@@ -95,6 +104,7 @@ export function resolveServeMime(filename: string, stored: string | null): strin
 }
 
 export function normalizeUploadMime(filename: string, clientMime: string): string | null {
+  if (isPlaintextOnly(filename)) return "text/plain; charset=utf-8";
   const byExt = mimeForFilename(filename);
   if (byExt) return byExt;
   const v = clientMime.trim();

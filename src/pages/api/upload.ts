@@ -4,6 +4,7 @@ import { createWriteStream, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { Readable } from "node:stream";
 import db from "../../server/db";
+import { normalizeUploadMime } from "../../server/mime";
 import { validateSession, getPublicOrigin } from "../../server/session";
 
 const MAX_SIZE = 256 * 1024 * 1024;
@@ -148,14 +149,14 @@ export const POST: APIRoute = async ({ request, cookies, clientAddress }) => {
       throw new UploadError(415, "Unsupported file extension");
     }
 
-    db.prepare("INSERT INTO files (id, discord_id, name, size, mime, created_at) VALUES (?, ?, ?, ?, ?, ?)").run(storageKey, session.discord_id, filename, size, mime || null, now);
+    db.prepare("INSERT INTO files (id, discord_id, name, size, mime, created_at) VALUES (?, ?, ?, ?, ?, ?)").run(storageKey, session.discord_id, filename, size, normalizeUploadMime(filename, mime), now);
 
     return Response.json({
       success: true,
       id: storageKey,
       name: filename,
       size: size,
-      type: mime,
+      type: normalizeUploadMime(filename, mime),
       url: new URL(`/f/${storageKey}`, getPublicOrigin(request, clientAddress)).toString(),
     });
   } catch (err) {

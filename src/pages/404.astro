@@ -1,0 +1,21 @@
+---
+import Main from "../layouts/main.astro";
+
+// the below is skidded from lunar v3 lol
+const list = ["this page doesn't exist :(", "searching for a page that doesn't exist...", "are you in the right place?", "lost?", "this page doesn't exist! D:"];
+let message = list[Math.floor(Math.random() * list.length)];
+---
+
+<Main title="tadpole - 404">
+  <div class="flex w-full flex-1 flex-col gap-2 items-center justify-center text-center">
+    <p class="text-xl text-ctp-text">
+      {message} <span class="text-ctp-subtext0">(404)</span>
+    </p>
+    <a
+      href="/"
+      class="hover:underline text-lg text-ctp-green"
+    >
+      go home
+    </a>
+  </div>
+</Main>

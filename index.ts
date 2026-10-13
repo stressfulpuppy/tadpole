@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { join, sep } from "node:path";
+import { join } from "node:path";
 import Fastify from "fastify";
 import compress from "@fastify/compress";
 import helmet from "@fastify/helmet";
@@ -38,7 +38,11 @@ const app = Fastify({
 });
 
 await app.register(helmet, { contentSecurityPolicy: false });
-await app.register(compress, { global: true, threshold: 1024 });
+await app.register(compress, {
+  global: true,
+  threshold: 1024,
+  customTypes: /^text\/|\+json$|\+xml$|\+text$|javascript|svg/,
+});
 
 if (existsSync(clientDir)) {
   await app.register(fastifyStatic, {
@@ -52,9 +56,12 @@ if (existsSync(clientDir)) {
     lastModified: true,
     maxAge: "1h",
     setHeaders: (reply, pathName) => {
-      if (pathName.includes(`${sep}_astro${sep}`)) {
-        reply.header("Cache-Control", "public, max-age=31536000, immutable");
+      if (/\.(html?|astro)$/i.test(pathName)) {
+        reply.header("Cache-Control", "no-cache, no-store, must-revalidate");
+        return;
       }
+      const hashed = /(?:[/]|[.\-_])[a-z0-9_-]{8,}\.(js|css|woff2?|png|jpe?g|svg|webp|gif|avif|ico|mp4|webm)$/i.test(pathName);
+      reply.header("Cache-Control", hashed ? "public, max-age=31536000, immutable" : "public, max-age=3600");
     },
   });
 } else {

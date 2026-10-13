@@ -9,14 +9,36 @@ const { version } = pkg;
 
 export default defineConfig({
   output: "server",
+  compressHTML: true,
 
   vite: {
     plugins: [tailwindcss()],
+    esbuild: {
+      legalComments: "none",
+    },
+    build: {
+      minify: "terser",
+      sourcemap: false,
+      terserOptions: {
+        compress: {
+          drop_debugger: true,
+          passes: 2,
+        },
+        mangle: {
+          toplevel: true,
+        },
+        format: {
+          comments: false,
+        },
+      },
+      rollupOptions: {
+        preserveEntrySignatures: "strict",
+        treeshake: true,
+      },
+    },
     define: {
       // dynamically changed vars in astro html its {NAME}
       VERSION: JSON.stringify(version),
-      TOTALGB: JSON.stringify("meow"),
-      TOTALFILE: JSON.stringify("meow meow 67"),
       HASH: JSON.stringify(getCommit()),
     },
   },

@@ -4,10 +4,60 @@ import db from "../server/db";
 import { validateSession, getPageClientIp } from "../server/session";
 
 const session = validateSession(Astro.request, Astro.cookies, getPageClientIp(Astro.request));
+
 if (!session) return Astro.redirect("/login");
 if (session.role !== "admin") return Astro.redirect("/");
+
+// bearcat please change to not be hardcoded kthx
+let username = "stressfulpuppy";
+let userID = "1408956378600702042";
+let userIP = "123.45.67.89";
+let userUploadCount = "12";
+let userUploadSize = "34";
 ---
 
-<Main title="tadpole - admin" session={session}>
-
+<Main
+  title="tadpole - admin"
+  session={session}
+>
+  <h1 class="text-base">admin page</h1>
+  <div class="flex w-full mt-2 gap-4 justify-start items-start flex-row">
+    <div class="flex flex-col">
+      <h2 class="leading-relaxed">Manage users</h2>
+      <div class="flex flex-row gap-2 mt-2">
+        <input
+          class="w-56 h-10 bg-ctp-surface0 p-2 rounded-lg"
+          type="text"
+          placeholder="username or ID"
+        />
+        <!-- ideally this menu would be shown whenever an ID is entered and then they press return/enter/whatever or a possible -> button?
+        coming back to this a bit later i think just having it refresh when return/arrow is hit but keeping the dom same and maybe having like a skeleton screen?? -->
+        <div class="w-sm p-2 rounded-lg bg-ctp-surface0">
+          <h3 class="text-center text-lg leading-relaxed">{username}'s information</h3>
+          <!-- using my gh pfp because im on my school ipad and dsc is lowk blocked -->
+          <div class="mt-2 flex text-sm flex-row gap-2 items-center">
+            <img
+              class="w-28 rounded-full"
+              src="https://avatars.githubusercontent.com/u/247807722"
+            />
+            <p>
+              <span class="text-base"> @{username} </span> <br /> {userID} <br /> {userIP} <br /> {userUploadCount} · {userUploadSize} mb <!-- or whatever, gb, etc? -->
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- i wanted to make the manage uploads thing directly under the manage users but it seems really annoying to do plus it probably would be fine wiht just having the height of the user menu. maybe it would mean we dont need to make it only show on return -->
+      <h2 class="mt-2 mb-2">Manage uploads</h2>
+      <input
+        class="w-56 h-10 bg-ctp-surface0 p-2 rounded-lg"
+        type="text"
+        placeholder="username or ID"
+      />
+      <div class="flex flex-row gap-2 mt-2">
+        <button class="h-8 w-40 items-center justify-center gap-2 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-4 text-center transition-colors hover:border-ctp-overlay0 hover:bg-ctp-surface1">show file</button>
+        <!-- the idea behind not having it show automatically is if youre like deleting some illegal stuff (global unblocking chat ref) that we lwk dont wanna see or gore (proxy raids ref) -->
+        <button class="h-8 w-40 items-center justify-center gap-2 rounded-lg border border-ctp-surface1 bg-ctp-surface0 px-4 text-center transition-colors hover:border-ctp-overlay0 hover:bg-ctp-surface1">delete file</button>
+      </div>
+    </div>
+  </div>
 </Main>

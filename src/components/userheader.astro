@@ -13,7 +13,8 @@ const isLoginPage = Astro.url.pathname === "/login";
 ---
 
 <header class="flex w-full items-center justify-end px-4 pt-3 sm:px-6">
-  <div class="relative">
+  <div class="absolute translate-y-4">
+    <!-- changed from relative to absolute because it was annoying me when i tried to put a page title for admin -->
     {session ? (
       <button
         id="userContext"

@@ -18,9 +18,12 @@ You'll need `pnpm` for this. You can get it by [installing Node.js](https://node
 
 ### Getting Started
 
+> [!NOTE]
+> Before building, install [git](https://git-scm.com/downloads) and [node.js](https://nodejs.org/en/download/prebuilt-installer). Then, install pnpm with `npm install -g pnpm`.
+
 First, you'll need to get a couple things &mdash; a Client ID, a Client Secret, and a domain. You can get the first two from the [Discord Developer Portal](https://discord.com/developers/home), on the OAuth2 page, and the latter will be the domain you're hosting it on.
 
-Copy the `example.env` into `.env`, then set your CLIENTID and CLIENTSECRET to the strings you got above. For REDIRECT, you should put something along the lines of `https://tadpole.rip/api/callback`, of course replacing `tadpole.rip` for your own domain. Also add this URL to your Discord app's Redirects. It should be directly under where you got your Client ID and Secret on the OAuth2 page. Don't forget to make yourself admin, along with anyone else you want to help moderate. You do this by setting ADMIN_IDS to your own ID and any others, seperated by comma.
+Copy the `example.env` into `.env`, then set your CLIENTID and CLIENTSECRET to the strings you got above. For REDIRECT, you should put something along the lines of `https://tadpole.rip/api/callback`, of course replacing `tadpole.rip` for your own domain. Also add this URL to your Discord app's Redirects. It should be directly under where you got your Client ID and Secret on the OAuth2 page. Don't forget to make yourself admin, along with anyone else you want to help moderate. You do this by setting ADMIN_IDS to your own ID and any others, separated by comma.
 
 ```sh
 pnpm install # installs all packages

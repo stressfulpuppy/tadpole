@@ -1,0 +1,36 @@
+---
+import Main from "../layouts/main.astro";
+import { Content as Rules } from "../docs/rules.md";
+---
+
+<!-- looking to edit the rules for your instance? go to /src/docs/rules.md and edit there! -->
+
+<Main title="tadpole">
+  <div class="**:leading-relaxed content">
+    <Rules />
+  </div>
+</Main>
+
+<!-- should i be putting this in another file? who knows... -->
+<style is:global>
+  @reference "../styles/global.css";
+
+  .content :is(h1) {
+    @apply text-ctp-text text-4xl font-bold;
+  }
+  .content :is(h2) {
+    @apply text-ctp-subtext1 text-2xl font-semibold;
+  }
+  .content :is(p) {
+    @apply text-ctp-subtext0 text-lg;
+  }
+  .content :is(a) {
+    @apply text-ctp-green underline-offset-2 hover:underline;
+  }
+  .content :is(ul) {
+    @apply text-ctp-overlay2 list-disc pl-5;
+  }
+  .content ul > li > p {
+    @apply text-ctp-overlay2;
+  }
+</style>

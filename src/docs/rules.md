@@ -1,13 +1,19 @@
 # tadpole FAQ
 
+Please note these rules are written for and apply to the official tadpole instance, and may not reflect every instance's rules.
+
 ## What can't I upload to tadpole?
 
 You cannot upload the following content types to tadpole:
 
-- illegal content (i.e., child pornography, bestiality, etc.)
+- illegal content (i.e., child pornography, bestiality, revenge porn, etc.)
+
+  csam will be reported to ncmec :c
+
 - lewd or explicit lolicon/shotacon
 - gore
 - hate speech/neonazi stuff
+- doxxes or personal information
 - copyrighted material (such as tv shows)
 
   although we are not proactive, we definitely completely take copyright infringement very 100% seriously. ;3 and, we will only take down files if a valid takedown request is submit to us!
@@ -18,7 +24,7 @@ Sure... (granted it's not against the above rules!)
 
 ## What data do you collect?
 
-We collect your Discord User ID, IP address, and keep a record of files you upload.
+We collect your Discord profile information, IP address, and keep a record of files you upload.
 
 ## Can I use hotlink tadpole media on my website?
 

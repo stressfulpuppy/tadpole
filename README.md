@@ -12,14 +12,14 @@ tadpole is an open-source, self-hostable, and lightweight file server written in
 
 Starting a tadpole server can be done in just a few easy steps :3
 
+> [!NOTE]
+> If you're hosting your own instance, please consider reading [the self-hosting guide](./HOSTING.md)
+
 ### Dependencies
 
 You'll need `pnpm` for this. You can get it by [installing Node.js](https://nodejs.org/en) and running `npm install -g pnpm`.
 
 ### Getting Started
-
-> [!NOTE]
-> Before building, install [git](https://git-scm.com/downloads) and [node.js](https://nodejs.org/en/download/prebuilt-installer). Then, install pnpm with `npm install -g pnpm`.
 
 First, you'll need to get a couple things &mdash; a Client ID, a Client Secret, and a domain. You can get the first two from the [Discord Developer Portal](https://discord.com/developers/home), on the OAuth2 page, and the latter will be the domain you're hosting it on.
 
@@ -37,3 +37,5 @@ To stay online across restarts, you can use a tool such as [pm2](https://pm2.key
 
 Thanks to [@bearcattt](https://github.com/bearcattt) for helping a lot with backend, frontend, and everything!!! <3  
 tadpole is released under the [Mozilla Public License v2](./LICENSE.md).
+
+&copy; tadpole Contributors

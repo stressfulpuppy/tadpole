@@ -3,6 +3,7 @@ import "../styles/global.css";
 import UserHeader from "../components/userheader.astro";
 import SiteFooter from "../components/sitefooter.astro";
 import { validateSession, getPageClientIp, getPublicOrigin, type Session } from "../server/session";
+import Analytics from "../components/analytics.astro";
 
 interface Props {
   title: string;
@@ -96,6 +97,7 @@ const description = "an open-source, self-hostable file server.";
     <title>
       {title}
     </title>
+    <Analytics />
   </head>
   <body class="bg-ctp-base">
     <div class="flex min-h-dvh flex-col bg-ctp-base font-jost font-medium text-ctp-text">

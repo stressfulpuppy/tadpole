@@ -37,5 +37,3 @@ To stay online across restarts, you can use a tool such as [pm2](https://pm2.key
 
 Thanks to [@bearcattt](https://github.com/bearcattt) for helping a lot with backend, frontend, and everything!!! <3  
 tadpole is released under the [Mozilla Public License v2](./LICENSE.md).
-
-&copy; tadpole Contributors
